@@ -225,6 +225,23 @@ Once it done, it will show following message
 Initialization script completed
 ```
 
+Now we create required HDFS folders
+
+```bash
+hdfs dfs -ls /
+hdfs dfs -rm -r /user
+hdfs dfs -ls /
+hdfs dfs -mkdir -p /user/hive/warehouse
+
+hdfs dfs -chmod g+w /user
+hdfs dfs -chmod g+wx /user
+
+hdfs dfs -chmod g+w /tmp
+hdfs dfs -chmod g+wx /tmp
+
+hdfs dfs -chown -R hive:hive /user/hive/warehouse
+hdfs dfs -chmod -R 770 /user/hive/warehouse
+```
 
 ## Step 3: Start Hive Services (metastore and Hiveserver2)
 
@@ -245,3 +262,18 @@ beeline -u "jdbc:hive2://mst01:2181,mst02:2181,mst03:2181/;serviceDiscoveryMode=
   <img alt="docker" src="https://github.com/kavindatk/hive_tez_spakr_cluster_3NN/blob/main/images/hive_log.JPG" width="800" height="400">
 </picture>
 
+
+```bash
+#Zookeeper verification
+
+zkCli.sh -server mst01:2181
+
+#Then execute
+
+[zk: mst01:2181(CONNECTED) 0] ls /
+[hadoop-ha, hiveserver2, killQueries, yarn-leader-election, zookeeper]
+[zk: mst01:2181(CONNECTED) 1]
+[zk: mst01:2181(CONNECTED) 1] ls /hiveserver2
+[serverUri=mst01:10000;version=4.0.0;sequence=0000000005, serverUri=mst02:10000;version=4.0.0;sequence=0000000006, serverUri=mst03:10000;version=4.0.0;sequence=0000000004]
+[zk: mst01:2181(CONNECTED) 2]quit
+```
