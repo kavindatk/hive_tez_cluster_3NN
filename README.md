@@ -103,66 +103,112 @@ cp hive-default.xml.template hive-site.xml
 Then add or modify
 
 ```xml
-  <property>
-    <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:mysql://bigdataproxy:3306/metastore?createDatabaseIfNotExist=true</value>
-    <description>
-      JDBC connect string for a JDBC metastore.
-      To use SSL to encrypt/authenticate the connection, provide database-specific SSL flag in the connection URL.
-      For example, jdbc:postgresql://myhost/db?ssl=true for postgres database.
-    </description>
-  </property>
-
-  <property>
-    <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>com.mysql.jdbc.Driver</value>
-    <description>Driver class name for a JDBC metastore</description>
-  </property>
-  <property>
-    <name>javax.jdo.option.ConnectionUserName</name>
-    <value>hiveuser</value>
-    <description>Username to use against metastore database</description>
-  </property>
-  <property>
-    <name>javax.jdo.option.ConnectionPassword</name>
-    <value>hiveuser</value>
-    <description>password to use against metastore database</description>
-  </property>
-  <property>
-    <name>hive.metastore.uris</name>
-    <value>thrift://bigdataproxy:9083</value>
-    <description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.</description>
-  </property>
-  <property>
-    <name>hive.server2.support.dynamic.service.discovery</name>
-    <value>true</value>
-    <description>Whether HiveServer2 supports dynamic service discovery for its clients. To support this, each instance of HiveServer2 currently uses ZooKeep>
-  </property>
-  <property>
-    <name>hive.server2.zookeeper.namespace</name>
-    <value>hiveserver2</value>
-    <description>The parent node in ZooKeeper used by HiveServer2 when supporting dynamic service discovery.</description>
-  </property>
-  <property>
-    <name>hive.zookeeper.quorum</name>
-    <value>zk1:2181,zk2:2181,zk3:2181</value>
-    <description>
-      List of ZooKeeper servers to talk to. This is needed for:
-      1. Read/write locks - when hive.lock.manager is set to
-      org.apache.hadoop.hive.ql.lockmgr.zookeeper.ZooKeeperHiveLockManager,
-      2. When HiveServer2 supports service discovery via Zookeeper.
-      3. For delegation token storage if zookeeper store is used, if
-      hive.cluster.delegation.token.store.zookeeper.connectString is not set
-      4. LLAP daemon registry service
-      5. Leader selection for privilege synchronizer
-    </description>
-  </property>
-
+<configuration>
+	<property>
+		<name>javax.jdo.option.ConnectionURL</name>
+		<value>jdbc:mysql://bigdataproxy:3307/metastore?createDatabaseIfNotExist=true</value>
+		<description>Metastore connection URL using HAProxy</description>
+	</property>
+	<property>
+		<name>javax.jdo.option.ConnectionDriverName</name>
+		<value>com.mysql.cj.jdbc.Driver</value>
+		<!--value>org.mariadb.jdbc.Driver</value-->
+	</property>
+	<property>
+		<name>javax.jdo.option.ConnectionUserName</name>
+		<value>hiveuser</value>
+	</property>
+	<property>
+		<name>javax.jdo.option.ConnectionPassword</name>
+		<value>hiveuser</value>
+	</property>
+	<property>
+		<name>hive.server2.thrift.bind.host</name>
+		<value>mst01</value>
+	</property>
+	<property>
+		<name>hive.metastore.warehouse.dir</name>
+		<value>hdfs:///user/hive/warehouse</value>
+	</property>
+	<property>
+		<name>hive.exec.scratchdir</name>
+		<value>hdfs:///tmp/hive</value>
+	</property>
+	<property>
+		<name>hive.repl.rootdir</name>
+		<value>hdfs:///usr/hive/repl</value>
+	</property>
+	<property>
+		<name>hive.exec.local.scratchdir</name>
+		<value>/tmp/${user.name}</value>
+	</property>
+	<property>
+		<name>hive.downloaded.resources.dir</name>
+		<value>/tmp/${user.name}_resources</value>
+	</property>
+	<property>
+		<name>hive.metastore.db.type</name>
+		<value>mysql</value>
+	</property>
+	<property>
+		<name>hive.server2.support.dynamic.service.discovery</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.server2.zookeeper.namespace</name>
+		<value>hiveserver2</value>
+	</property>
+	<property>
+		<name>hive.server2.transport.mode</name>
+		<value>binary</value>
+	</property>
+	<property>
+		<name>hive.zookeeper.quorum</name>
+		<value>mst01:2181,mst02:2181,mst03:2181</value>
+	</property>
+	<property>
+		<name>hive.server2.enable.doAs</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.execution.engine</name>
+		<value>mr</value>
+	</property>
+	<property>
+		<name>hive.vectorized.execution.enabled</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.vectorized.execution.reduce.enabled</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.tez.container.size</name>
+		<value>8192</value>
+	</property>
+	<property>
+		<name>hive.tez.java.opts</name>
+		<value>-Xmx6144m</value>
+	</property>
+	<property>
+		<name>hive.metastore.uris</name>
+		<value>thrift://mst01:9083,thrift://mst02:9083,thrift://mst03:9083</value>
+	</property>
+	<property>
+		<name>hive.server2.thrift.port</name>
+		<value>10000</value>
+	</property>
+	<property>
+		<name>hive.server2.zookeeper.publish.configs</name>
+		<value>true</value>
+	</property>
+</configuration>
 ```
 
 ```bash
 cd hive/lib/
 rm -rf guava-22.0.jar
+rm -rf log4j-slf4j-impl-2.18.0.jar
 cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar /opt/hive/lib/
 ```
 
@@ -188,3 +234,14 @@ For All 3 NN
 nohup hive --service metastore > hive-metastore.log 2>&1 &
 nohup hive --service hiveserver2 > hive-server2.log 2>&1 &
 ```
+
+## Step 4: Test and Verification
+
+```bash
+beeline -u "jdbc:hive2://mst01:2181,mst02:2181,mst03:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2"
+```
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/hive_tez_spakr_cluster_3NN/blob/main/images/hive_log.JPG" width="800" height="400">
+</picture>
+
