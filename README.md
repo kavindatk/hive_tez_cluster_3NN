@@ -15,14 +15,14 @@
 
 In the previous setup, we successfully installed and tested a <b>3-NameNode Hadoop environment</b>.
 In this article, I’ll explain how to set up a <b>high availability (HA) Hive environment</b> with 3 active-standby HiveServer2 instances running on top of the Hadoop cluster.
-For this setup, I’ll be using <b>Hive 4.0.1</b>, which is the current stable version.
-We’ll begin with the Hive installation and configuration, and once that’s complete, we’ll move on to setting up Tez and Spark in the next stages.
+For this setup, I’ll be using <b>Hive 4.0.1 and TEZ 0.10.4 </b>, which is the current stable version.
+We’ll begin with the Hive installation and configuration, and once that’s complete, we’ll move on to setting up Tez in the next stages.
 
 <br/><br/>
 
 ## Step 1: Download, Extract, and Rename
 
-The following steps show how to download the current stable versions of HIVE, TEZ and SPARK, extract the files, and rename the directories for easier use.
+The following steps show how to download the current stable versions of HIVE and TEZ, extract the files, and rename the directories for easier use.
 
 #### Hive
 
@@ -32,8 +32,18 @@ tar -xvzf apache-hive-4.0.1-bin.tar.gz
 mv apache-hive-4.0.1-bin hive
 ```
 
-<br/><
+#### TEZ
 
+```bash
+wget https://dlcdn.apache.org/tez/0.10.4/apache-tez-0.10.4-bin.tar.gz
+tar -xvzf apache-tez-0.10.4-bin.tar.gz
+mv apache-tez-0.10.4-bin tez
+```
+
+<br/>
+
+# Hive
+<br/>
 ## Step 2: Set Environment Variables and Configure Hive
 
 We have already downloaded and renamed the Hive folder as needed. In this step, we’ll set the required environment variables and configure Hive.
@@ -301,3 +311,115 @@ pkill -f metastore
 ```
 
 
+# TEZ
+<br/>
+
+## Step 2: Set Environment Variables and Configure TEZ
+
+
+We have already downloaded and renamed the TEZ folder as needed. In this step, we’ll set the required environment variables and configure TEZ.
+
+The steps below show how to complete this process.
+
+<br/>
+
+#### 2.1 Set Environment Variables
+
+```bash
+nano nano ~/.bashrc
+```
+
+```bash
+#TEZ Related Options
+export TEZ_HOME=/opt/tez
+export TEZ_CONF_DIR=$TEZ_HOME/conf
+
+export TEZ_JARS=$TEZ_HOME
+# For enabling hive to use the Tez engine
+if [ -z "$HIVE_AUX_JARS_PATH" ]; then
+export HIVE_AUX_JARS_PATH="$TEZ_JARS"
+else
+export HIVE_AUX_JARS_PATH="$HIVE_AUX_JARS_PATH:$TEZ_JARS"
+fi
+
+export HADOOP_CLASSPATH=${TEZ_CONF_DIR}:${TEZ_JARS}/*:${TEZ_JARS}/lib/*
+```
+
+```bash
+source ~/.bashrc
+```
+
+<br/>
+
+#### 2.2 Configure TEZ
+
+##### Create HDFS Folders
+
+```bash
+sudo cp $HIVE_HOME/lib/protobuf-java-3.24.4.jar /opt/tez/lib/
+rm -rf /opt/tez/lib/slf4j-reload4j-1.7.36.jar
+```
+
+```bash
+hdfs dfs -mkdir /apps
+hdfs dfs -mkdir /apps/tez
+hdfs dfs -chmod g+w /apps
+hdfs dfs -chmod g+wx /apps
+hdfs dfs -put /opt/tez/* /apps/tez/
+hdfs dfs -put $HIVE_HOME/lib/hive-exec-4.0.0.jar /apps/tez
+```
+
+##### tez-site.xml
+
+```bash
+nano /opt/tez/conf/tez-site.xml
+```
+
+Then add or modify
+
+```xml
+
+<configuration>
+  <property>
+    <name>tez.lib.uris</name>
+    <value>hdfs:///apps/tez/share/tez.tar.gz</value>
+  </property>
+  <property>
+    <name>tez.use.cluster.hadoop-libs</name>
+    <value>true</value>
+  </property>
+</configuration>
+```
+
+##### hive-site.xml
+
+TEZ run on top of HIVE therefore we have to introduce TEZ configurations to HIVE , add or modify following in hive-site.xml (All 3NN)
+
+```xml
+<property>
+  <name>hive.execution.engine</name>
+  <value>tez</value>
+</property>
+<property>
+  <name>tez.lib.uris</name>
+  <value>hdfs:///apps/tez/share/tez.tar.gz</value>
+</property>
+<property>
+  <name>hive.tez.container.size</name>
+  <value>4096</value>
+</property>
+<property>
+  <name>hive.tez.java.opts</name>
+  <value>-Xmx3072m</value>
+</property>
+<property>
+  <name>hive.tez.log.level</name>
+  <value>INFO</value>
+</property>
+```
+
+### Distribute Hive and Tez Configurations to All Nodes
+
+Now that we’ve successfully configured Hive and Tez, the next step is to distribute these configurations across the remaining nodes in the cluster.
+Before copying, make sure to check for any node-specific configurations, such as unique paths, hostnames, or roles (like active/standby). Avoid overwriting those parts during distribution.
+Once verified, you can safely copy the Hive and Tez folders along with their configuration files to all other nodes.
