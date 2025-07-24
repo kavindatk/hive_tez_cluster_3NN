@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?><!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<configuration>
+	<property>
+		<name>javax.jdo.option.ConnectionURL</name>
+		<value>jdbc:mysql://bigdataproxy:3307/metastore?createDatabaseIfNotExist=true</value>
+		<description>Metastore connection URL using HAProxy</description>
+	</property>
+	<property>
+		<name>javax.jdo.option.ConnectionDriverName</name>
+		<value>com.mysql.cj.jdbc.Driver</value>
+	</property>
+	<property>
+		<name>javax.jdo.option.ConnectionUserName</name>
+		<value>hiveuser</value>
+	</property>
+	<property>
+		<name>javax.jdo.option.ConnectionPassword</name>
+		<value>hiveuser</value>
+	</property>
+	<property>
+		<name>hive.server2.thrift.bind.host</name>
+		<value>mst01</value>
+	</property>
+	<property>
+		<name>hive.metastore.warehouse.dir</name>
+		<value>hdfs:///user/hive/warehouse</value>
+	</property>
+	<property>
+		<name>hive.exec.scratchdir</name>
+		<value>hdfs:///tmp/hive</value>
+	</property>
+	<property>
+		<name>hive.repl.rootdir</name>
+		<value>hdfs:///usr/hive/repl</value>
+	</property>
+	<property>
+		<name>hive.exec.local.scratchdir</name>
+		<value>/tmp/${user.name}</value>
+	</property>
+	<property>
+		<name>hive.downloaded.resources.dir</name>
+		<value>/tmp/${user.name}_resources</value>
+	</property>
+	<property>
+		<name>hive.metastore.db.type</name>
+		<value>mysql</value>
+	</property>
+	<property>
+		<name>hive.server2.support.dynamic.service.discovery</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.server2.zookeeper.namespace</name>
+		<value>hiveserver2</value>
+	</property>
+	<property>
+		<name>hive.server2.transport.mode</name>
+		<value>binary</value>
+	</property>
+	<property>
+		<name>hive.zookeeper.quorum</name>
+		<value>mst01:2181,mst02:2181,mst03:2181</value>
+	</property>
+	<property>
+		<name>hive.server2.enable.doAs</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.execution.engine</name>
+		<value>mr</value>
+	</property>
+	<property>
+		<name>hive.vectorized.execution.enabled</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.vectorized.execution.reduce.enabled</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hive.tez.container.size</name>
+		<value>8192</value>
+	</property>
+	<property>
+		<name>hive.tez.java.opts</name>
+		<value>-Xmx6144m</value>
+	</property>
+	<property>
+		<name>hive.metastore.uris</name>
+		<value>thrift://mst01:9083,thrift://mst02:9083,thrift://mst03:9083</value>
+	</property>
+	<property>
+		<name>hive.server2.thrift.port</name>
+		<value>10000</value>
+	</property>
+	<property>
+		<name>hive.server2.zookeeper.publish.configs</name>
+		<value>true</value>
+	</property>
+  <property>
+  	<name>hive.server2.authentication</name>
+  	<value>NONE</value>
+  	<description>
+  	  Expects one of [nosasl, none, ldap, kerberos, pam, custom, saml, jwt].
+  	  Client authentication types.
+  		NONE: no authentication check
+  		LDAP: LDAP/AD based authentication
+  		KERBEROS: Kerberos/GSSAPI authentication
+  		CUSTOM: Custom authentication provider
+  				(Use with property hive.server2.custom.authentication.class)
+  		PAM: Pluggable authentication module
+  		NOSASL:  Raw transport
+  		SAML: SAML 2.0 compliant authentication. This is only supported in http transport mode.
+  		JWT: JWT based authentication. HS2 expects JWT contains the user name as subject and was signed by an
+  			 asymmetric key. This is only supported in http transport mode.
+  	</description>
+  </property>
+     
+<!--
+   TEZ configurations
+-->     
+	<property>
+	  <name>hive.execution.engine</name>
+	  <value>tez</value>
+	</property>
+	<property>
+	  <name>tez.lib.uris</name>
+	  <value>hdfs:///apps/tez/share/tez.tar.gz</value>
+	</property>
+	<property>
+	  <name>hive.tez.container.size</name>
+	  <value>4096</value>
+	</property>
+	<property>
+	  <name>hive.tez.java.opts</name>
+	  <value>-Xmx3072m</value>
+	</property>
+	<property>
+	  <name>hive.tez.log.level</name>
+	  <value>INFO</value>
+	</property>
+</configuration>
