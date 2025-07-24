@@ -248,6 +248,7 @@ hdfs dfs -chmod -R 770 /user/hive/warehouse
 For All 3 NN
 
 ```bash
+hdfs dfs -chmod 777 /user/hive/warehouse
 nohup hive --service metastore > hive-metastore.log 2>&1 &
 nohup hive --service hiveserver2 > hive-server2.log 2>&1 &
 ```
@@ -277,3 +278,15 @@ zkCli.sh -server mst01:2181
 [serverUri=mst01:10000;version=4.0.0;sequence=0000000005, serverUri=mst02:10000;version=4.0.0;sequence=0000000006, serverUri=mst03:10000;version=4.0.0;sequence=0000000004]
 [zk: mst01:2181(CONNECTED) 2]quit
 ```
+
+## Useful Commands
+
+```bash
+# 1. Stop HiveServer2
+pkill -f hiveserver2
+
+# 2. Stop Metastore
+pkill -f metastore
+```
+
+
