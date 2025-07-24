@@ -1,4 +1,4 @@
-# Part 3: Install Hive, Tez, and Spark on the 3-NameNode Hadoop Cluster
+# Part 3: Install Hive and TEZ on the 3-NameNode Hadoop Cluster
 
 <br/><br/>
 <p align="center">
@@ -9,13 +9,6 @@
 <picture>
   <img alt="docker" src="https://github.com/kavindatk/hive_tez_spakr_cluster_3NN/blob/main/images/tez.jpg" width="250" height="150">
 </picture>
-
-
-<picture>
-  <img alt="docker" src="https://github.com/kavindatk/hive_tez_spakr_cluster_3NN/blob/main/images/spark.JPG" width="250" height="150">
-</picture>
-</p>
-
 </p>
 
 <br/><br/>
