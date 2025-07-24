@@ -423,3 +423,158 @@ TEZ run on top of HIVE therefore we have to introduce TEZ configurations to HIVE
 Now that we’ve successfully configured Hive and Tez, the next step is to distribute these configurations across the remaining nodes in the cluster.
 Before copying, make sure to check for any node-specific configurations, such as unique paths, hostnames, or roles (like active/standby). Avoid overwriting those parts during distribution.
 Once verified, you can safely copy the Hive and Tez folders along with their configuration files to all other nodes.
+
+
+## Step 3: Test and Verification
+
+```bash
+# Create Dummy Data Set
+cd /home/hadoop
+seq 1 10000000 > numbers.txt
+hdfs dfs -mkdir /user/hive/warehouse/sample/
+hdfs dfs -put numbers.txt /user/hive/warehouse/sample/
+```
+
+```bash
+beeline -u "jdbc:hive2://bigdataproxy/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2"
+```
+
+
+```bash
+0: jdbc:hive2://bigdataproxy/> show databases;
+INFO  : Compiling command(queryId=hadoop_20250724081919_b58a82cb-3908-45aa-9bf1-bd379d447b67): show databases
+INFO  : Semantic Analysis Completed (retrial = false)
+INFO  : Created Hive schema: Schema(fieldSchemas:[FieldSchema(name:database_name, type:string, comment:from deserializer)], properties:null)
+INFO  : Completed compiling command(queryId=hadoop_20250724081919_b58a82cb-3908-45aa-9bf1-bd379d447b67); Time taken: 0.005 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hadoop_20250724081919_b58a82cb-3908-45aa-9bf1-bd379d447b67): show databases
+INFO  : Starting task [Stage-0:DDL] in serial mode
+INFO  : Completed executing command(queryId=hadoop_20250724081919_b58a82cb-3908-45aa-9bf1-bd379d447b67); Time taken: 0.029 seconds
++----------------+
+| database_name  |
++----------------+
+| data_load      |
+| default        |
++----------------+
+2 rows selected (0.101 seconds)
+0: jdbc:hive2://bigdataproxy/>
+0: jdbc:hive2://bigdataproxy/>
+0: jdbc:hive2://bigdataproxy/> use data_load;
+INFO  : Compiling command(queryId=hadoop_20250724082529_8fbbd373-7be8-48f5-9f3e-905fe7555ed0): use data_load
+INFO  : Semantic Analysis Completed (retrial = false)
+INFO  : Created Hive schema: Schema(fieldSchemas:null, properties:null)
+INFO  : Completed compiling command(queryId=hadoop_20250724082529_8fbbd373-7be8-48f5-9f3e-905fe7555ed0); Time taken: 0.012 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hadoop_20250724082529_8fbbd373-7be8-48f5-9f3e-905fe7555ed0): use data_load
+INFO  : Starting task [Stage-0:DDL] in serial mode
+INFO  : Completed executing command(queryId=hadoop_20250724082529_8fbbd373-7be8-48f5-9f3e-905fe7555ed0); Time taken: 0.025 seconds
+No rows affected (0.06 seconds)
+0: jdbc:hive2://bigdataproxy/> CREATE  TABLE data_load.number_data (
+. . . . . . . . . . . . . . .> val_col bigint
+. . . . . . . . . . . . . . .> )row format delimited fields terminated by ','
+. . . . . . . . . . . . . . .> location '/user/hive/warehouse/sample/';
+INFO  : Compiling command(queryId=hadoop_20250724082550_5e8f74fa-2bf9-42e9-b89e-f89f3d9a42bf): CREATE  TABLE data_load.number_data (
+val_col bigint
+)row format delimited fields terminated by ','
+location '/user/hive/warehouse/sample/'
+INFO  : Semantic Analysis Completed (retrial = false)
+INFO  : Created Hive schema: Schema(fieldSchemas:null, properties:null)
+INFO  : Completed compiling command(queryId=hadoop_20250724082550_5e8f74fa-2bf9-42e9-b89e-f89f3d9a42bf); Time taken: 0.057 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hadoop_20250724082550_5e8f74fa-2bf9-42e9-b89e-f89f3d9a42bf): CREATE  TABLE data_load.number_data (
+val_col bigint
+)row format delimited fields terminated by ','
+location '/user/hive/warehouse/sample/'
+INFO  : Starting task [Stage-0:DDL] in serial mode
+INFO  : Completed executing command(queryId=hadoop_20250724082550_5e8f74fa-2bf9-42e9-b89e-f89f3d9a42bf); Time taken: 0.87 seconds
+No rows affected (0.944 seconds)
+0: jdbc:hive2://bigdataproxy/> show tables;
+INFO  : Compiling command(queryId=hadoop_20250724082559_6d421984-4f2f-4258-a6db-2905e8598e16): show tables
+INFO  : Semantic Analysis Completed (retrial = false)
+INFO  : Created Hive schema: Schema(fieldSchemas:[FieldSchema(name:tab_name, type:string, comment:from deserializer)], properties:null)
+INFO  : Completed compiling command(queryId=hadoop_20250724082559_6d421984-4f2f-4258-a6db-2905e8598e16); Time taken: 0.017 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hadoop_20250724082559_6d421984-4f2f-4258-a6db-2905e8598e16): show tables
+INFO  : Starting task [Stage-0:DDL] in serial mode
+INFO  : Completed executing command(queryId=hadoop_20250724082559_6d421984-4f2f-4258-a6db-2905e8598e16); Time taken: 0.091 seconds
++--------------+
+|   tab_name   |
++--------------+
+| number_data  |
+| test_01      |
++--------------+
+2 rows selected (0.168 seconds)
+0: jdbc:hive2://bigdataproxy/> desc number_data;
+INFO  : Compiling command(queryId=hadoop_20250724082607_a2c743ae-695b-428d-9632-3e10dc3aaba5): desc number_data
+INFO  : Semantic Analysis Completed (retrial = false)
+INFO  : Created Hive schema: Schema(fieldSchemas:[FieldSchema(name:col_name, type:string, comment:from deserializer), FieldSchema(name:data_type, type:string, comment:from deserializer), FieldSchema(name:comment, type:string, comment:from deserializer)], properties:null)
+INFO  : Completed compiling command(queryId=hadoop_20250724082607_a2c743ae-695b-428d-9632-3e10dc3aaba5); Time taken: 0.094 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hadoop_20250724082607_a2c743ae-695b-428d-9632-3e10dc3aaba5): desc number_data
+INFO  : Starting task [Stage-0:DDL] in serial mode
+INFO  : Completed executing command(queryId=hadoop_20250724082607_a2c743ae-695b-428d-9632-3e10dc3aaba5); Time taken: 0.048 seconds
++-----------+------------+----------+
+| col_name  | data_type  | comment  |
++-----------+------------+----------+
+| val_col   | bigint     |          |
++-----------+------------+----------+
+1 row selected (0.18 seconds)
+hadoop@mst01:~/HIVE_LOG$ beeline -u "jdbc:hive2://bigdataproxy/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2" -n hadoop
+Connecting to jdbc:hive2://bigdataproxy/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2
+25/07/24 08:50:57 [main]: INFO jdbc.ZooKeeperHiveClientHelper: Discovered HiveServer2 hosts in ZooKeeper [/hiveserver2]: [serverUri=mst03:10000;version=4.0.0;sequence=0000000018, serverUri=mst02:10000;version=4.0.0;sequence=0000000020, serverUri=mst01:10000;version=4.0.0;sequence=0000000019]
+25/07/24 08:50:57 [main]: INFO jdbc.HiveConnection: Connected to mst03:10000
+Connected to: Apache Hive (version 4.0.0)
+Driver: Hive JDBC (version 4.0.0)
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+Beeline version 4.0.0 by Apache Hive
+0: jdbc:hive2://bigdataproxy/> select sum(val_col) from data_load.number_data;
+INFO  : Compiling command(queryId=hadoop_20250724085100_7c24996a-b32b-43d2-9118-9f248f284d71): select sum(val_col) from data_load.number_data
+INFO  : No Stats for data_load@number_data, Columns: val_col
+INFO  : Semantic Analysis Completed (retrial = false)
+INFO  : Created Hive schema: Schema(fieldSchemas:[FieldSchema(name:_c0, type:bigint, comment:null)], properties:null)
+INFO  : Completed compiling command(queryId=hadoop_20250724085100_7c24996a-b32b-43d2-9118-9f248f284d71); Time taken: 4.232 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hadoop_20250724085100_7c24996a-b32b-43d2-9118-9f248f284d71): select sum(val_col) from data_load.number_data
+INFO  : Query ID = hadoop_20250724085100_7c24996a-b32b-43d2-9118-9f248f284d71
+INFO  : Total jobs = 1
+INFO  : Launching Job 1 out of 1
+INFO  : Starting task [Stage-1:MAPRED] in serial mode
+INFO  : Subscribed to counters: [] for queryId: hadoop_20250724085100_7c24996a-b32b-43d2-9118-9f248f284d71
+INFO  : Tez session hasn't been created yet. Opening session
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+Map 1            container       RUNNING      2          0        2        0       0       0
+Reducer 2        container        INITED      1          0        0        1       0       0
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+INFO  : Completed executing command(queryId=hadoop_20250724085100_7c24996a-b32b-43d2-9118-9f248f284d71); Time taken: 135.676 seconds
+Map 1 .......... container     SUCCEEDED      2          2        0        0       0       0
+Reducer 2 ...... container     SUCCEEDED      1          1        0        0       0       0
+----------------------------------------------------------------------------------------------
+VERTICES: 02/02  [==========================>>] 100%  ELAPSED TIME: 16.49 s
+----------------------------------------------------------------------------------------------
++-----------------+
+|       _c0       |
++-----------------+
+| 50000005000000  |
++-----------------+
+1 row selected (140.468 seconds)
+0: jdbc:hive2://bigdataproxy/>
+
+```
+
+<picture>
+  <img alt="docker" src="https://github.com/kavindatk/hive_tez_cluster_3NN/blob/main/images/tez_log.JPG" width="800" height="400">
+</picture>
+
+
+## Useful Commands
+
+```bash
+#If you got any error on TEZ running
+cd /opt/hive/lib/
+mv tez-api-0.10.3.jar tez-api-0.10.3.jar_backup
+cp /opt/tez/tez-api-0.10.4.jar /opt/hive/lib/
+```
