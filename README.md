@@ -202,6 +202,24 @@ Then add or modify
 		<name>hive.server2.zookeeper.publish.configs</name>
 		<value>true</value>
 	</property>
+	  <property>
+		<name>hive.server2.authentication</name>
+		<value>NONE</value>
+		<description>
+		  Expects one of [nosasl, none, ldap, kerberos, pam, custom, saml, jwt].
+		  Client authentication types.
+			NONE: no authentication check
+			LDAP: LDAP/AD based authentication
+			KERBEROS: Kerberos/GSSAPI authentication
+			CUSTOM: Custom authentication provider
+					(Use with property hive.server2.custom.authentication.class)
+			PAM: Pluggable authentication module
+			NOSASL:  Raw transport
+			SAML: SAML 2.0 compliant authentication. This is only supported in http transport mode.
+			JWT: JWT based authentication. HS2 expects JWT contains the user name as subject and was signed by an
+				 asymmetric key. This is only supported in http transport mode.
+		</description>
+	  </property>
 </configuration>
 ```
 
