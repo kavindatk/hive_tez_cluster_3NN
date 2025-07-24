@@ -573,7 +573,7 @@ VERTICES: 02/02  [==========================>>] 100%  ELAPSED TIME: 16.49 s
 ## Useful Commands
 
 ```bash
-#If you got any error on TEZ running
+#If you got any error on TEZ running (Version Mismatches)
 cd /opt/hive/lib/
 mv tez-api-0.10.3.jar tez-api-0.10.3.jar_backup
 cp /opt/tez/tez-api-0.10.4.jar /opt/hive/lib/
