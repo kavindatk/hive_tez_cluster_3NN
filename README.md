@@ -310,6 +310,11 @@ pkill -f hiveserver2
 pkill -f metastore
 ```
 
+## Hive server web
+
+http://<name node ip>:10002/
+
+
 
 # TEZ
 <br/>
