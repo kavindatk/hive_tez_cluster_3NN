@@ -223,7 +223,94 @@ Then add or modify
 				 asymmetric key. This is only supported in http transport mode.
 		</description>
 	  </property>
-</configuration>
+
+<property>
+  <name>hive.metastore.transactional.event.listeners</name>
+  <value>org.apache.hive.hcatalog.listener.DbNotificationListener</value>
+</property>
+
+<property>
+  <name>hive.metastore.dml.events</name>
+  <value>true</value>
+</property>
+<property>
+  <name>hive.create.as.external.legacy</name>
+  <value>false</value>
+</property>	     
+
+<property>
+  <name>hive.default.table.type</name>
+  <value>managed</value>
+</property>
+
+<property>
+  <name>hive.create.as.insert.only</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>hive.support.concurrency</name>
+  <value>true</value>
+  <description>Whether Hive supports concurrency or not. A ZooKeeper instance must be up and running for the default Hive lock manager to support read-write locks.</description>
+</property>
+
+<property>
+  <name>hive.txn.manager</name>
+  <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+  <description>Set this to org.apache.hadoop.hive.ql.lockmgr.DbTxnManager to enable ACID transactions.</description>
+</property>
+
+<property>
+  <name>hive.enforce.bucketing</name>
+  <value>true</value>
+  <description>Whether bucketing is enforced.</description>
+</property>
+
+<property>
+  <name>hive.exec.dynamic.partition.mode</name>
+  <value>nonstrict</value>
+  <description>In strict mode, the user must specify at least one static partition in case the user accidentally overwrites all partitions. In nonstrict mode all partitions are allowed to be dynamic.</description>
+</property>
+
+<property>
+  <name>hive.compactor.initiator.on</name>
+  <value>true</value>
+  <description>Whether to run the initiator and cleaner threads on this metastore instance. Set this to true on one instance of the Thrift metastore service as part of turning on Hive transactions.</description>
+</property>
+<property>
+  <name>metastore.client.capability.check</name>
+  <value>false</value> 
+</property>
+
+<property>
+  <name>hive.compactor.worker.threads</name>
+  <value>1</value> 
+</property>
+
+
+<!--
+   TEZ configurations
+-->     
+	<property>
+	  <name>hive.execution.engine</name>
+	  <value>tez</value>
+	</property>
+	<property>
+	  <name>tez.lib.uris</name>
+	  <value>hdfs:///apps/tez/share/tez.tar.gz</value>
+	</property>
+	<property>
+	  <name>hive.tez.container.size</name>
+	  <value>4096</value>
+	</property>
+	<property>
+	  <name>hive.tez.java.opts</name>
+	  <value>-Xmx3072m</value>
+	</property>
+	<property>
+	  <name>hive.tez.log.level</name>
+	  <value>INFO</value>
+	</property>
 ```
 
 ```bash
