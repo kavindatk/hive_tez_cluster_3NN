@@ -399,7 +399,7 @@ pkill -f metastore
 
 ## Hive server web
 
-http://name node ip:10002/
+http://mst01:10002/
 
 
 
